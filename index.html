@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiết kế form xử lý dữ liệu</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container-form {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px solid #ddd;
+        }
+
+        td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .product-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .stt {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .price-input, .quantity-input {
+            width: 100%;
+            max-width: 150px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+            transition: border-color 0.3s;
+        }
+
+        .price-input:focus, .quantity-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .total-row {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .total-row td {
+            padding: 15px;
+            border: 2px solid #667eea;
+        }
+
+        .total-label {
+            text-align: right;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .total-amount {
+            font-size: 18px;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-custom {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-reset {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-reset:hover {
+            background: #dee2e6;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .alert-info {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            color: #0c5aa0;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f7ff;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+            font-size: 15px;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 16px;
+            color: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .container-form {
+                padding: 15px;
+            }
+
+            .product-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 13px;
+            }
+
+            .price-input, .quantity-input {
+                max-width: 100px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-form">
+        <h1>Mua hoa</h1>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 8%;">STT</th>
+                    <th style="width: 25%;">Hình ảnh</th>
+                    <th style="width: 20%;">Giá</th>
+                    <th style="width: 22%;">Số lượng</th>
+                    <th style="width: 25%;">Tổng tiền</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Rows will be generated by JavaScript -->
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="4" class="total-label">Tổng thành tiền:</td>
+                    <td class="total-amount" id="grandTotal">0 đ</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="alert-info">
+            <i class="fas fa-info-circle"></i> Nhập số lượng vào ô "Số lượng" rồi bấm "Tính toán" để cập nhật tổng tiền
+        </div>
+
+        <div class="button-group">
+            <button class="btn-custom btn-calculate" onclick="calculateTotal()">
+                <i class="fas fa-calculator"></i> Tính toán
+            </button>
+            <button class="btn-custom btn-reset" onclick="resetForm()">
+                <i class="fas fa-redo"></i> Đặt lại
+            </button>
+        </div>
+
+        <div class="result-box" id="resultBox">
+            <h5><i class="fas fa-receipt"></i> Chi tiết đơn hàng:</h5>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        const products = [
+            {
+                name: 'Bó hoa hồng đỏ',
+                price: 20000,
+                image: 'abd.jpg'
+            },
+            {
+                name: 'Bó hoa lục bảo',
+                price: 40000,
+                image: 'download.jpg'
+            },
+            {
+                name: 'Bó hoa hồng phấn',
+                price: 30000,
+                image: 'OIP.jpg'
+            },
+            {
+                name: 'Bó hoa đa màu',
+                price: 50000,
+                image: 'abc.jpg'
+            },
+            {
+                name: 'Bó hoa hồng kem',
+                price: 30000,
+                image: 'bcd.jpg'
+            }
+        ];
+
+        function createTable() {
+            const tableBody = $('#tableBody');
+            tableBody.empty();
+
+            products.forEach((product, index) => {
+                const row = `
+                    <tr>
+                        <td class="stt">${index + 1}</td>
+                        <td>
+                            <img src="${product.image}" alt="${product.name}" class="product-image">
+                            <p class="product-name mt-2">${product.name}</p>
+                        </td>
+                        <td>
+                            <input type="number" class="price-input" value="${product.price}" readonly>
+                        </td>
+                        <td>
+                            <input type="number" class="quantity-input" id="qty-${index}" value="0" min="0">
+                        </td>
+                        <td>
+                            <span class="product-total" id="total-${index}">0 đ</span>
+                        </td>
+                    </tr>
+                `;
+                tableBody.append(row);
+            });
+        }
+
+        function calculateTotal() {
+            let grandTotal = 0;
+            let orderDetails = [];
+
+            products.forEach((product, index) => {
+                const quantity = parseInt($(`#qty-${index}`).val()) || 0;
+                const total = product.price * quantity;
+
+                $(`#total-${index}`).text(total.toLocaleString('vi-VN') + ' đ');
+
+                grandTotal += total;
+
+                if (quantity > 0) {
+                    orderDetails.push({
+                        name: product.name,
+                        price: product.price,
+                        quantity: quantity,
+                        total: total
+                    });
+                }
+            });
+
+            $('#grandTotal').text(grandTotal.toLocaleString('vi-VN') + ' đ');
+
+            // Hiển thị chi tiết đơn hàng
+            if (orderDetails.length > 0) {
+                let resultHTML = '';
+                orderDetails.forEach(item => {
+                    resultHTML += `
+                        <div class="result-item">
+                            <span>${item.name} x${item.quantity}</span>
+                            <span>${item.total.toLocaleString('vi-VN')} đ</span>
+                        </div>
+                    `;
+                });
+                resultHTML += `
+                    <div class="result-item">
+                        <span>Tổng cộng:</span>
+                        <span>${grandTotal.toLocaleString('vi-VN')} đ</span>
+                    </div>
+                `;
+                $('#resultContent').html(resultHTML);
+                $('#resultBox').addClass('show');
+            } else {
+                $('#resultBox').removeClass('show');
+            }
+        }
+
+        function resetForm() {
+            $('.quantity-input').val(0);
+            $('.product-total').text('0 đ');
+            $('#grandTotal').text('0 đ');
+            $('#resultBox').removeClass('show');
+        }
+
+        // Khởi tạo
+        $(document).ready(function() {
+            createTable();
+        });
+
+        // Tính toán khi thay đổi số lượng (real-time)
+        $(document).on('change', '.quantity-input', function() {
+            calculateTotal();
+        });
+    </script>
+</body>
+</html>
